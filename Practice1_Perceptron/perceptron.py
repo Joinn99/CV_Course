@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Percerption Test Function
+# Percerptron Test Function
 # Group Member: Wei Tianjun / Tang Mingyang
 
 
