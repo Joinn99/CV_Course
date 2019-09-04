@@ -5,28 +5,28 @@ import matplotlib.pyplot as plt
 # Group Member: Wei Tianjun / Tang Mingyang
 
 
-def perceptron_test(seeds=99, num_obsevations=500, learning_rate=1, iteration_thres=0.003):
+def perceptron_test(seeds=99, num_obsevations=500, learning_rate=0.001, iteration_thres=0.002):
     print('-----Perception Test-----\nSeed: ' + str(seeds) +
           '\nSample Number: ' + str(num_obsevations*2))
     print('Learning Rate: ' + str(learning_rate) +
           '\nIteration Threshold: ' + str(iteration_thres) + '\n')
+    # Initialize parameters
     np.random.seed(seeds)
     iteration_error = iteration_thres
     epoch = 0
+    vec_x1 = np.random.multivariate_normal(
+        [1, 0, -3], [[0, 0, 0], [0, 1, .75], [0, .75, 1]], num_obsevations)
+    vec_x2 = np.random.multivariate_normal(
+        [1, 1, 2], [[0, 0, 0], [0, 1, .75], [0, .75, 1]], num_obsevations)
+    vec_x = np.vstack((vec_x1, vec_x2)).astype(np.float32)
+    vec_y = np.hstack(
+        (np.zeros(num_obsevations), np.ones(num_obsevations)))
+    vec_w = np.ones(3, dtype=float) / 3
     # Exit when iteration error smaller than threshold
     while iteration_error >= iteration_thres:
         # Generate random data samples
         iteration_error = .0
         epoch += 1
-        vec_x1 = np.random.multivariate_normal(
-            [1, 0, -3], [[0, 0, 0], [0, 1, .75], [0, .75, 1]], num_obsevations)
-        vec_x2 = np.random.multivariate_normal(
-            [1, 1, 2], [[0, 0, 0], [0, 1, .75], [0, .75, 1]], num_obsevations)
-        # Initialize parameters
-        vec_x = np.vstack((vec_x1, vec_x2)).astype(np.float32)
-        vec_y = np.hstack(
-            (np.zeros(num_obsevations), np.ones(num_obsevations)))
-        vec_w = np.ones(3, dtype=float) / 3
         # Update parameters
         for index in range(vec_x.shape[0]):
             var_y = 1 if np.dot(vec_x[index], vec_w) > 0 else 0
