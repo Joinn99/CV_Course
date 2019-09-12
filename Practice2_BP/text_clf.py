@@ -15,7 +15,7 @@ def text_clf():
     num_test = len(newsgroups_test.data)
 
     # max_features is an important parameter. You should adjust it.
-    vectorizer = TfidfVectorizer(max_features=220)
+    vectorizer = TfidfVectorizer(max_features=384)
 
     X = vectorizer.fit_transform(newsgroups_train.data + newsgroups_test.data)
     X_train = X[0:num_train, :]
@@ -28,9 +28,9 @@ def text_clf():
     print(X_test.shape, Y_test.shape)
 
     clf = nn_block.NNClassifier(
-        input_features=220, hidden_features=128, output_features=4)
+        input_features=384, hidden_features=192, output_features=4)
 
-    clf.fit(X_train.toarray(), Y_train, epsilon=0.0005, num_passes=5000)
+    clf.fit(X_train.toarray(), Y_train, epsilon=0.001, num_passes=10000, reg_lambda=0.05)
 
     Y_predict = clf.predict(X_test.toarray())
 
