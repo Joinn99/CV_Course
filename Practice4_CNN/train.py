@@ -1,5 +1,6 @@
 import torch
 import torchvision
+from PIL import Image, ImageDraw
 import model
 
 # Parameters
@@ -20,7 +21,7 @@ TRAIN_DATA = torchvision.datasets.MNIST(
 TEST_DATA = torchvision.datasets.MNIST(
     root='./Practice4_CNN/',
     train=False,
-) # shape from (2000, 28, 28) to (2000, 1, 28, 28), value in range(0,1)
+)  # shape from (2000, 28, 28) to (2000, 1, 28, 28), value in range(0,1)
 TEST_X = (torch.unsqueeze(TEST_DATA.data, dim=1).type(
     torch.FloatTensor) / 255.).cuda()
 TEST_Y = TEST_DATA.targets.cuda()
@@ -29,6 +30,8 @@ TRAIN_LOADER = torch.utils.data.DataLoader(
     dataset=TRAIN_DATA, batch_size=BATCH_SIZE, shuffle=True)
 
 # Train function
+
+
 def train(use_model=False):
     clf = model.ConvClassifier().cuda()
     if use_model:
@@ -64,6 +67,8 @@ def calculate_accuracy(clf):
     return accuracy
 
 # Find the unmatched results
+
+
 def find_incorrect(clf):
     pred_y = torch.zeros_like(TEST_Y)
     for index in range(20):
@@ -82,7 +87,22 @@ def find_incorrect(clf):
               ' | Ground truth: {:1d}'.format(TEST_Y[index]))
     print('\nIncorrect index matrix: (PRED_IND, TRUE_IND)')
     print(matrix_incorrect)
+    vec_err_pred = torch.sum(matrix_incorrect, dim=1)
+    img = Image.new(
+        TEST_DATA[0][0].mode, (36 * (torch.max(vec_err_pred).item() + 1), 360))
+    draw = ImageDraw.Draw(img)
+    for index in range(10):
+        draw.text((12, 36 * index + 12),
+                  '{:1d}'.format(index), fill=255)
 
+    for index in incorrect:
+        img.paste(TEST_DATA[index][0], (36 *
+                                        vec_err_pred[pred_y[index]] + 4, 36 * pred_y[index] + 4))
+        draw.text((36 * vec_err_pred[pred_y[index]], 36 * pred_y[index]),
+                  '{:1d}'.format(TEST_Y[index]), fill=255)
+        vec_err_pred[pred_y[index]] -= 1
+    img.save('./Practice4_CNN/incorrect.png')
+    img.show()
 
 
 if __name__ == "__main__":
