@@ -4,10 +4,12 @@ from PIL import Image, ImageDraw
 import model
 
 # Parameters
+USE_MODEL = True
 TRAIN = False
-LR = 5e-6
-EPOCH = 2
-BATCH_SIZE = 300
+LR = 2e-5
+EPOCH = 6
+BATCH_SIZE = 100
+EXPECT_ACCU = 0.9927
 
 # Load MNIST datasets
 TRAIN_DATA = torchvision.datasets.MNIST(
@@ -46,14 +48,18 @@ def train(use_model=False):
             loss.backward()
             optimizer.step()
 
-            if not (step + 1) % 50:
+            if not (step + 1) % 100 or step == 0:
                 clf.eval()
                 accu = calculate_accuracy(clf=clf)
                 print('Epoch {:2d}'.format(epoch) +
                       ' | Step {:3d}'.format(step), end=' | ')
                 print('Acc: {:.4f}'.format(accu) +
                       ' | Loss: {:.4f}'.format(loss.float()))
+                if accu > EXPECT_ACCU:
+                    torch.save(
+                        clf.state_dict(), './Practice4_CNN/Model/params-{:.4f}.pkl'.format(accu))
                 clf.train()
+
     torch.save(clf.state_dict(), './Practice4_CNN/Model/params.pkl')
 
 
@@ -107,9 +113,9 @@ def find_incorrect(clf):
 
 if __name__ == "__main__":
     if TRAIN:
-        train(use_model=True)
+        train(use_model=USE_MODEL)
     else:
         CLF = model.ConvClassifier().cuda()
-        CLF.load_state_dict(torch.load('./Practice4_CNN/Model/params.pkl'))
+        CLF.load_state_dict(torch.load('./Practice4_CNN/Model/params-0.9927.pkl'))
         CLF.eval()
         find_incorrect(CLF)
