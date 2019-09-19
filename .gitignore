@@ -1,4 +1,6 @@
 *.pyc
 *.pkl
 *.txt
+*.png
+*.jpg
 Practice4_CNN/MNIST/*
